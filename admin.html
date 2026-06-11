@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Admin · Eleven Labs QVCT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Barlow:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B3E;--navy-card:#0F1F45;--navy-card2:#172860;
+  --pink:#E8335A;--pink-dark:#C42248;
+  --stress:#E8335A;--stress-bg:rgba(232,51,90,0.12);--stress-border:rgba(232,51,90,0.35);
+  --physio:#F59E0B;--physio-bg:rgba(245,158,11,0.12);--physio-border:rgba(245,158,11,0.35);
+  --social:#2B7FE8;--social-bg:rgba(43,127,232,0.12);--social-border:rgba(43,127,232,0.35);
+  --border:rgba(255,255,255,0.08);--border-hover:rgba(255,255,255,0.18);
+  --text:#FFFFFF;--muted:rgba(255,255,255,0.55);--muted2:rgba(255,255,255,0.28);
+  --radius:14px;--radius-sm:8px;--header-bg:#D8DCE8;--header-text:#1A2340;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+nav{background:var(--header-bg);margin:12px 20px;border-radius:40px;padding:10px 20px;display:flex;align-items:center;gap:10px;}
+.logo-text{font-family:'Barlow',sans-serif;font-size:15px;font-weight:800;color:var(--header-text);}
+.nav-sep{width:1px;height:18px;background:rgba(26,35,64,.2);}
+.nav-title{font-size:13px;color:rgba(26,35,64,.6);font-weight:500;}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--pink);color:#fff;padding:4px 12px;border-radius:20px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 1.8s infinite;display:inline-block;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-refresh{margin-left:8px;font-size:12px;color:rgba(26,35,64,.55);background:rgba(26,35,64,.08);border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;}
+.nav-refresh:hover{background:rgba(26,35,64,.15);}
+.main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+.bilan-header{margin-bottom:28px;}
+.bilan-header h1{font-family:'Barlow',sans-serif;font-size:32px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;}
+.bilan-header h1 em{color:var(--pink);font-style:normal;}
+.bilan-header p{font-size:14px;color:var(--muted);}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:24px;}
+.kpi{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.kpi-val{font-family:'Barlow',sans-serif;font-size:34px;font-weight:900;line-height:1;}
+.kpi-sub{font-size:12px;color:var(--muted2);margin-top:4px;}
+.kpi.hi .kpi-val{color:var(--pink);}
+.kpi.sk .kpi-val{color:#F87171;}
+.kpi.pk .kpi-val{color:#FCD34D;}
+.kpi.lk .kpi-val{color:#60A5FA;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+.card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.section-title{font-family:'Barlow',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.2px;margin-bottom:14px;}
+.dr-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.dr-row:last-child{border-bottom:none;}
+.dr-pos{font-family:'Barlow',sans-serif;font-size:13px;font-weight:900;width:22px;color:var(--muted2);flex-shrink:0;}
+.dr-emoji{font-size:17px;width:24px;flex-shrink:0;}
+.dr-name{flex:1;font-size:13px;font-weight:500;}
+.dr-tags{display:flex;gap:3px;flex-shrink:0;}
+.tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;}
+.tag.stress{color:#F87171;background:var(--stress-bg);border-color:var(--stress-border);}
+.tag.physio{color:#FCD34D;background:var(--physio-bg);border-color:var(--physio-border);}
+.tag.social{color:#60A5FA;background:var(--social-bg);border-color:var(--social-border);}
+.dr-bar-wrap{width:70px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;flex-shrink:0;}
+.dr-bar{height:100%;background:var(--pink);border-radius:3px;}
+.dr-count{font-size:12px;color:var(--muted);min-width:24px;text-align:right;flex-shrink:0;}
+.rps-row{margin-bottom:16px;}
+.rps-row:last-child{margin-bottom:0;}
+.rps-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.rps-name{font-size:13px;font-weight:500;}
+.rps-track{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.rps-fill{height:100%;border-radius:4px;transition:width .6s;}
+.part-table{width:100%;border-collapse:collapse;}
+.part-table th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted2);text-align:left;padding:0 0 10px;border-bottom:1px solid var(--border);}
+.part-table td{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.part-table tr:last-child td{border-bottom:none;}
+.part-av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-right:8px;vertical-align:middle;}
+.prog-bar{display:inline-block;height:4px;border-radius:2px;background:var(--pink);vertical-align:middle;margin-right:6px;}
+.part-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.empty{text-align:center;padding:40px;color:var(--muted2);font-size:14px;}
+.export-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:transparent;border:1px solid var(--border);border-radius:24px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;margin-bottom:24px;}
+.export-btn:hover{border-color:var(--border-hover);color:var(--text);}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,0,0,.2);border-top-color:var(--header-text);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <span style="font-size:17px">🛸</span>
+  <span class="logo-text">Eleven Labs</span>
+  <div class="nav-sep"></div>
+  <span class="nav-title">Dashboard admin · QVCT</span>
+  <span class="nav-badge">Bilan journée</span>
+  <button class="nav-refresh" id="refresh-btn" onclick="loadAndRender()">
+    <div class="live-dot"></div> Actualiser
+  </button>
+</nav>
+
+<div class="main">
+  <div class="bilan-header">
+    <h1>Bilan de la journée <em>pauses actives</em></h1>
+    <p id="bilan-date"></p>
+  </div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <button class="export-btn" onclick="exportCSV()">⬇ Exporter en CSV</button>
+  <div class="two-col">
+    <div class="card"><div class="section-title">🏅 Défis les plus relevés</div><div id="defis-ranking"></div></div>
+    <div class="card"><div class="section-title">🧩 Répartition par catégorie RPS</div><div id="rps-breakdown" style="margin-top:8px"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="section-title">👥 Participants <span id="part-label" style="font-size:13px;color:var(--muted);font-family:Inter;font-weight:400"></span></div>
+    <div id="part-table"></div>
+  </div>
+  <div class="card">
+    <div class="section-title">📸 Preuves photo soumises</div>
+    <div id="photos"></div>
+  </div>
+</div>
+
+<script>
+const DEFIS=[
+  {id:1,e:'📧',n:'Direct Connect',rps:['stress','social']},
+  {id:2,e:'🚶',n:'Walking Meeting',rps:['physio','social']},
+  {id:3,e:'🚲',n:'Active Commute',rps:['physio']},
+  {id:4,e:'🦵',n:'Leg Sprint',rps:['physio']},
+  {id:5,e:'🥗',n:'Midday Release',rps:['physio','social']},
+  {id:6,e:'🪜',n:'Level Up',rps:['physio']},
+  {id:7,e:'💪',n:'Force Push',rps:['physio']},
+  {id:8,e:'🫀',n:'Cardiac Sync',rps:['stress']},
+  {id:9,e:'🫁',n:'Crunch Request',rps:['physio']},
+  {id:10,e:'🪑',n:'Stand-up meeting',rps:['stress','social']},
+  {id:11,e:'📵',n:'Focus Mode',rps:['stress']},
+];
+const TAG_LABELS={stress:'🧠 Stress',physio:'🦴 Séden.',social:'🤝 Social'};
+const COLS=['#E8335A','#2B7FE8','#0EADAD','#8B5CF6','#F59E0B','#10B981','#EF4444','#6366F1'];
+const gc=n=>{let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLS.length;return COLS[h];};
+const ini=n=>n.slice(0,2).toUpperCase();
+const medals=['🥇','🥈','🥉'];
+
+async function loadAndRender(){
+  const btn=document.getElementById('refresh-btn');
+  btn.innerHTML='<div class="spinner"></div> Chargement…';
+  try{
+    const data=await fetch('/api/data').then(r=>r.json());
+    render(data);
+  }catch(e){
+    document.getElementById('kpi-grid').innerHTML='<div class="empty" style="grid-column:1/-1">Impossible de charger les données</div>';
+  }
+  btn.innerHTML='<div class="live-dot"></div> Actualiser';
+}
+
+function render(data){
+  const players=Object.entries(data);
+  const totalPlayers=players.length;
+  const totalDone=players.reduce((s,[,d])=>s+Object.keys(d).length,0);
+  const partRate=totalPlayers>0?Math.round(totalDone/(totalPlayers*11)*100):0;
+  const photoCount=players.reduce((s,[,d])=>s+Object.values(d).filter(v=>v.hasPhoto).length,0);
+  const rpsCounts={stress:0,physio:0,social:0};
+  players.forEach(([,done])=>Object.keys(done).forEach(id=>{
+    const d=DEFIS.find(x=>x.id===parseInt(id));
+    if(d)d.rps.forEach(r=>{rpsCounts[r]++;});
+  }));
+
+  document.getElementById('bilan-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi hi"><div class="kpi-label">Participants</div><div class="kpi-val">${totalPlayers}</div><div class="kpi-sub">astronautes mobilisés</div></div>
+    <div class="kpi"><div class="kpi-label">Défis validés</div><div class="kpi-val">${totalDone}</div><div class="kpi-sub">sur ${totalPlayers*11} possibles</div></div>
+    <div class="kpi"><div class="kpi-label">Taux de complétion</div><div class="kpi-val">${partRate}<span style="font-size:16px;font-family:Inter">%</span></div><div class="kpi-sub">en moyenne</div></div>
+    <div class="kpi"><div class="kpi-label">Photos soumises</div><div class="kpi-val">${photoCount}</div><div class="kpi-sub">preuves photo</div></div>
+    <div class="kpi sk"><div class="kpi-label">🧠 Stress</div><div class="kpi-val">${rpsCounts.stress}</div><div class="kpi-sub">défis validés</div></div>
+    <div class="kpi pk"><div class="kpi-label">🦴 Sédentarité</div><div class="kpi-val">${rpsCounts.physio}</div><div class="kpi-sub">défis validés</div></div>
+    <div class="kpi lk"><div class="kpi-label">🤝 Isolement</div><div class="kpi-val">${rpsCounts.social}</div><div class="kpi-sub">défis validés</div></div>`;
+
+  // Défis ranking
+  const ranked=DEFIS.map(d=>({...d,count:players.filter(([,done])=>done[d.id]).length})).sort((a,b)=>b.count-a.count);
+  const maxC=ranked[0]?.count||1;
+  document.getElementById('defis-ranking').innerHTML=ranked.map((d,i)=>`
+    <div class="dr-row">
+      <div class="dr-pos">${i<3?medals[i]:i+1}</div>
+      <div class="dr-emoji">${d.e}</div>
+      <div class="dr-name">${d.n}</div>
+      <div class="dr-tags">${d.rps.map(r=>`<span class="tag ${r}">${TAG_LABELS[r]}</span>`).join('')}</div>
+      <div class="dr-bar-wrap"><div class="dr-bar" style="width:${Math.round(d.count/maxC*100)}%"></div></div>
+      <div class="dr-count">${d.count}</div>
+    </div>`).join('');
+
+  // RPS
+  const rpsTotal=rpsCounts.stress+rpsCounts.physio+rpsCounts.social||1;
+  document.getElementById('rps-breakdown').innerHTML=[
+    {k:'stress',l:'Stress & surcharge mentale',c:'#F87171'},
+    {k:'physio',l:'Sédentarité & tensions physiques',c:'#FCD34D'},
+    {k:'social',l:'Isolement & lien social',c:'#60A5FA'},
+  ].map(r=>`<div class="rps-row">
+    <div class="rps-top"><span class="rps-name" style="color:${r.c}">${r.l}</span>
+    <span style="font-family:Barlow;font-size:15px;font-weight:800;color:${r.c}">${rpsCounts[r.k]} <span style="font-size:11px;font-family:Inter;font-weight:400;color:var(--muted)">(${Math.round(rpsCounts[r.k]/rpsTotal*100)}%)</span></span></div>
+    <div class="rps-track"><div class="rps-fill" style="width:${Math.round(rpsCounts[r.k]/rpsTotal*100)}%;background:${r.c}"></div></div>
+  </div>`).join('');
+
+  // Participants
+  const sorted=[...players].sort((a,b)=>Object.keys(b[1]).length-Object.keys(a[1]).length);
+  document.getElementById('part-label').textContent=`— ${totalPlayers} astronaute${totalPlayers>1?'s':''}`;
+  document.getElementById('part-table').innerHTML=sorted.length===0?'<div class="empty">Aucun participant</div>':`
+    <table class="part-table"><thead><tr>
+      <th></th><th>Pseudo</th><th>Défis</th><th>Progression</th><th>Catégories RPS</th>
+    </tr></thead><tbody>${sorted.map(([name,done],i)=>{
+      const score=Object.keys(done).length;
+      const pct=Math.round(score/11*100);
+      const col=gc(name);
+      const rp={stress:0,physio:0,social:0};
+      Object.keys(done).forEach(id=>{const d=DEFIS.find(x=>x.id===parseInt(id));if(d)d.rps.forEach(r=>{rp[r]++;});});
+      const tags=Object.entries(rp).filter(([,v])=>v>0).map(([k])=>`<span class="tag ${k}">${TAG_LABELS[k]}</span>`).join('');
+      return`<tr>
+        <td>${i<3?medals[i]:i+1}</td>
+        <td><span class="part-av" style="background:${col}22;color:${col}">${ini(name)}</span>${name}</td>
+        <td><strong>${score}</strong> / 11</td>
+        <td><span class="prog-bar" style="width:${Math.min(pct,80)}px"></span>${pct}%</td>
+        <td><div class="part-tags">${tags||'<span style="color:var(--muted2)">—</span>'}</div></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+
+  // Photos
+  const allPhotos=[];
+  players.forEach(([name,done])=>Object.entries(done).forEach(([id,v])=>{
+    if(v.hasPhoto){const d=DEFIS.find(x=>x.id===parseInt(id));allPhotos.push({name,defi:d?.n,e:d?.e||'📸'});}
+  }));
+  document.getElementById('photos').innerHTML=allPhotos.length===0
+    ?'<div class="empty">Aucune photo soumise</div>'
+    :`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">${allPhotos.map(p=>`
+      <div style="background:var(--navy-card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:26px;margin-bottom:6px">${p.e}</div>
+        <div style="font-size:11px;font-weight:600">${p.name}</div>
+        <div style="font-size:10px;color:var(--muted2)">${p.defi}</div>
+      </div>`).join('')}</div>`;
+
+  window._exportData=data;
+}
+
+function exportCSV(){
+  const data=window._exportData||{};
+  const rows=[['Pseudo','Score','Taux','Stress','Sédentarité','Isolement',...DEFIS.map(d=>d.n)]];
+  Object.entries(data).forEach(([name,done])=>{
+    const rp={stress:0,physio:0,social:0};
+    Object.keys(done).forEach(id=>{const d=DEFIS.find(x=>x.id===parseInt(id));if(d)d.rps.forEach(r=>{rp[r]++;});});
+    rows.push([name,Object.keys(done).length,Math.round(Object.keys(done).length/11*100)+'%',rp.stress,rp.physio,rp.social,...DEFIS.map(d=>done[d.id]?'✓':'')]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='bilan-qvct-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+loadAndRender();
+setInterval(loadAndRender, 30000);
+</script>
+</body>
+</html>

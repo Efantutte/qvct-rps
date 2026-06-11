@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journée Pauses Actives · Eleven Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Barlow:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B3E;--navy-card:#0F1F45;--navy-card2:#172860;
+  --pink:#E8335A;--pink-dark:#C42248;--pink-glow:rgba(232,51,90,0.15);
+  --stress:#E8335A;--stress-bg:rgba(232,51,90,0.12);--stress-border:rgba(232,51,90,0.35);
+  --physio:#F59E0B;--physio-bg:rgba(245,158,11,0.12);--physio-border:rgba(245,158,11,0.35);
+  --social:#2B7FE8;--social-bg:rgba(43,127,232,0.12);--social-border:rgba(43,127,232,0.35);
+  --border:rgba(255,255,255,0.08);--border-hover:rgba(255,255,255,0.18);
+  --text:#FFFFFF;--muted:rgba(255,255,255,0.55);--muted2:rgba(255,255,255,0.28);
+  --radius:14px;--radius-sm:8px;--header-bg:#D8DCE8;--header-text:#1A2340;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.top-nav{background:var(--header-bg);margin:12px 16px;border-radius:40px;padding:10px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.logo-text{font-family:'Barlow',sans-serif;font-size:15px;font-weight:800;color:var(--header-text);letter-spacing:-.2px;}
+.nav-sep{width:1px;height:18px;background:rgba(26,35,64,.2);}
+.nav-title{font-size:13px;color:rgba(26,35,64,.6);font-weight:500;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.nav-live{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(26,35,64,.55);background:rgba(26,35,64,.08);padding:4px 10px;border-radius:20px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-pseudo{font-size:12px;font-weight:600;color:var(--header-text);background:rgba(26,35,64,.1);padding:4px 12px;border-radius:20px;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+/* ONBOARDING */
+.onboard-body{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+.onboard-inner{max-width:480px;width:100%;}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--pink);background:var(--pink-glow);border:1px solid rgba(232,51,90,.3);border-radius:20px;padding:5px 14px;margin-bottom:18px;}
+.onboard-inner h1{font-family:'Barlow',sans-serif;font-size:46px;font-weight:900;line-height:1.05;letter-spacing:-1px;margin-bottom:14px;}
+.onboard-inner h1 em{color:var(--pink);font-style:normal;}
+.onboard-inner p{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:32px;max-width:400px;}
+.onboard-form{display:flex;flex-direction:column;gap:12px;max-width:360px;}
+.onboard-form input{padding:14px 18px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;color:var(--text);outline:none;transition:border-color .15s;}
+.onboard-form input::placeholder{color:var(--muted2);}
+.onboard-form input:focus{border-color:var(--pink);}
+.btn-primary{padding:13px 28px;background:var(--pink);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:hover{background:var(--pink-dark);}
+.btn-primary:disabled{background:rgba(255,255,255,.1);color:var(--muted2);cursor:not-allowed;}
+.btn-ghost{padding:13px 28px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:24px;font-size:14px;cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;}
+.btn-ghost:hover{border-color:var(--border-hover);color:var(--text);}
+/* INTRO RPS */
+.intro-body{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 24px;}
+.intro-inner{max-width:640px;width:100%;}
+.intro-inner h1{font-family:'Barlow',sans-serif;font-size:38px;font-weight:900;line-height:1.08;letter-spacing:-.8px;margin-bottom:10px;}
+.intro-inner h1 em{color:var(--pink);font-style:normal;}
+.intro-def{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px;padding:16px 20px;background:rgba(255,255,255,.04);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+.intro-def strong{color:var(--text);font-weight:600;}
+.rps-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:28px;}
+.rps-card{border-radius:var(--radius-sm);padding:16px;border:1px solid;}
+.rps-card.stress{background:var(--stress-bg);border-color:var(--stress-border);}
+.rps-card.physio{background:var(--physio-bg);border-color:var(--physio-border);}
+.rps-card.social{background:var(--social-bg);border-color:var(--social-border);}
+.rps-card-icon{font-size:22px;margin-bottom:8px;}
+.rps-card-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.rps-card.stress .rps-card-title{color:#F87171;}
+.rps-card.physio .rps-card-title{color:#FCD34D;}
+.rps-card.social .rps-card-title{color:#60A5FA;}
+.rps-card-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+/* APP */
+.main{max-width:1020px;margin:0 auto;padding:28px 20px 80px;width:100%;}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+.stat{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;}
+.stat-val{font-family:'Barlow',sans-serif;font-size:30px;font-weight:900;margin-top:4px;}
+.stat-val span{font-size:14px;color:var(--muted);font-family:'Inter',sans-serif;font-weight:400;}
+.stat.hi .stat-val{color:var(--pink);}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:24px;padding:4px;margin-bottom:22px;width:fit-content;}
+.tab-btn{padding:8px 22px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--muted);border-radius:20px;font-family:inherit;transition:all .15s;}
+.tab-btn.active{background:var(--pink);color:#fff;}
+.tab-btn:not(.active):hover{color:var(--text);}
+.defis-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:10px;}
+.defi-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden;}
+.defi-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,51,90,.06) 0%,transparent 60%);opacity:0;transition:opacity .2s;}
+.defi-card:hover{border-color:var(--border-hover);}
+.defi-card:hover::before,.defi-card.done::before{opacity:1;}
+.defi-card.done{border-color:var(--pink);background:rgba(232,51,90,.06);}
+.done-tag{position:absolute;top:0;right:0;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:0 14px 0 10px;letter-spacing:.5px;}
+.defi-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;}
+.defi-emoji{width:46px;height:46px;background:var(--navy-card2);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.defi-card.done .defi-emoji{background:var(--pink-glow);border-color:rgba(232,51,90,.3);}
+.defi-name{font-family:'Barlow',sans-serif;font-size:16px;font-weight:800;line-height:1.2;margin-bottom:5px;letter-spacing:-.2px;}
+.defi-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+.defi-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.tag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid;}
+.tag.stress{color:#F87171;background:var(--stress-bg);border-color:var(--stress-border);}
+.tag.physio{color:#FCD34D;background:var(--physio-bg);border-color:var(--physio-border);}
+.tag.social{color:#60A5FA;background:var(--social-bg);border-color:var(--social-border);}
+.defi-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:12px;}
+.defi-peers{font-size:11px;color:var(--muted2);}
+.defi-peers b{color:var(--muted);}
+.defi-cta{font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;}
+.defi-cta:hover{border-color:rgba(232,51,90,.5);color:var(--pink);}
+.defi-card.done .defi-cta{border-color:rgba(232,51,90,.4);color:var(--pink);background:var(--pink-glow);}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+/* PODIUM */
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:8px;height:220px;margin:4px 0 28px;}
+.pod-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;max-width:180px;}
+.pod-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.pod-bar{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.pod-name{font-size:12px;color:var(--muted);text-align:center;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pod-sc{font-size:11px;color:var(--muted2);}
+.lb{display:flex;flex-direction:column;gap:8px;}
+.lb-row{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;display:flex;align-items:center;gap:14px;}
+.lb-row.me{border-color:var(--pink);}
+.lb-rk{font-family:'Barlow',sans-serif;font-size:15px;font-weight:900;width:26px;text-align:center;color:var(--muted2);}
+.lb-rk.g{color:#C99B3A;}.lb-rk.s{color:#999;}.lb-rk.b{color:#B07050;}
+.lb-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.lb-name{flex:1;font-size:14px;font-weight:500;}
+.lb-name.me::after{content:" (moi)";font-size:11px;color:var(--muted);font-weight:400;}
+.lb-prog{width:88px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.lb-fill{height:100%;background:var(--pink);border-radius:2px;transition:width .5s;}
+.lb-num{font-size:13px;color:var(--muted);min-width:44px;text-align:right;}
+.empty{text-align:center;padding:48px;color:var(--muted2);font-size:14px;}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(7,12,28,.8);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal-hd{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.modal-hd .m-ico{width:44px;height:44px;background:var(--pink-glow);border:1px solid rgba(232,51,90,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.modal h2{font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.3px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.55;padding-left:56px;}
+.modal-rps{display:flex;gap:5px;flex-wrap:wrap;padding-left:56px;margin-bottom:18px;}
+.m-sec{margin-bottom:20px;}
+.m-sec label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px;}
+.m-hint{font-size:12px;color:var(--muted2);margin-bottom:8px;}
+.upload-zone{border:1px dashed rgba(255,255,255,.15);border-radius:var(--radius-sm);padding:22px;text-align:center;cursor:pointer;transition:border-color .15s;background:rgba(255,255,255,.03);}
+.upload-zone:hover,.upload-zone.has-file{border-color:var(--pink);}
+.upload-zone input{display:none;}
+.upload-icon{font-size:28px;margin-bottom:6px;}
+.upload-text{font-size:13px;color:var(--muted);}
+.upload-zone.has-file .upload-text{color:var(--pink);}
+.photo-preview{margin-top:10px;border-radius:var(--radius-sm);overflow:hidden;max-height:150px;display:none;}
+.photo-preview img{width:100%;height:150px;object-fit:cover;}
+.q-box{background:rgba(232,51,90,.08);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin-bottom:10px;}
+.q-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--pink);margin-bottom:5px;}
+.q-text{font-size:14px;color:var(--text);line-height:1.5;}
+.modal textarea{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;resize:vertical;min-height:80px;color:var(--text);outline:none;transition:border-color .15s;}
+.modal textarea::placeholder{color:var(--muted2);}
+.modal textarea:focus{border-color:var(--pink);}
+.m-actions{display:flex;gap:10px;}
+.btn-cancel{flex:1;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:none;font-size:14px;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;}
+.btn-cancel:hover{border-color:var(--border-hover);color:var(--text);}
+.btn-ok{flex:2;padding:12px;background:var(--pink);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-ok:hover:not(:disabled){background:var(--pink-dark);}
+.btn-ok:disabled{background:rgba(255,255,255,.07);color:var(--muted2);cursor:not-allowed;}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--pink);color:#fff;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 8px 32px rgba(232,51,90,.4);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN 1 : ONBOARDING -->
+<div id="screen-onboard" class="screen active">
+  <nav class="top-nav">
+    <div class="logo-wrap"><span style="font-size:17px">🛸</span><span class="logo-text">Eleven Labs</span></div>
+    <div class="nav-sep"></div>
+    <span class="nav-title">Semaine QVCT</span>
+  </nav>
+  <div class="onboard-body">
+    <div class="onboard-inner">
+      <span class="eyebrow">Semaine QVCT · Mission anti-RPS</span>
+      <h1>Les astronautes<br>bougent <em>ensemble</em></h1>
+      <p>On vous propose 11 défis pour <strong style="color:var(--text)">lutter contre les risques psychosociaux</strong> — bouger, déconnecter un instant et recharger les batteries. Choisis ton pseudo et rejoins le classement en direct !</p>
+      <div class="onboard-form">
+        <input type="text" id="pseudo-input" placeholder="Ton prénom ou pseudo…" maxlength="20"/>
+        <button class="btn-primary" id="btn-join" onclick="startApp()">Rejoindre les défis →</button>
+        <button class="btn-ghost" onclick="goTo('screen-intro')">🧠 En savoir plus sur les RPS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ÉCRAN 2 : INTRO RPS -->
+<div id="screen-intro" class="screen">
+  <nav class="top-nav">
+    <div class="logo-wrap" onclick="goTo('screen-onboard')"><span style="font-size:17px">🛸</span><span class="logo-text">Eleven Labs</span></div>
+    <div class="nav-sep"></div>
+    <span class="nav-title">Semaine QVCT</span>
+  </nav>
+  <div class="intro-body">
+    <div class="intro-inner">
+      <span class="eyebrow">Pourquoi ces défis ?</span>
+      <h1>Les RPS, c'est <em>quoi</em> exactement ?</h1>
+      <div class="intro-def">
+        <strong>Risques PsychoSociaux (RPS)</strong> — Risques liés à l'environnement professionnel qui portent atteinte à la santé physique et mentale des travailleurs. Ils sont à l'interface de l'individu <em>(psycho)</em> et de sa situation de travail <em>(social)</em>.
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Les 3 facteurs que nos défis ciblent</p>
+      <div class="rps-cards">
+        <div class="rps-card stress"><div class="rps-card-icon">🧠</div><div class="rps-card-title">Stress & surcharge mentale</div><div class="rps-card-desc">Pression, hyperconnexion, difficulté à déconnecter et à récupérer entre les tâches.</div></div>
+        <div class="rps-card physio"><div class="rps-card-icon">🦴</div><div class="rps-card-title">Sédentarité & tensions physiques</div><div class="rps-card-desc">Position statique prolongée, manque de mouvement, douleurs musculaires et fatigue corporelle.</div></div>
+        <div class="rps-card social"><div class="rps-card-icon">🤝</div><div class="rps-card-title">Isolement & lien social</div><div class="rps-card-desc">Travail en silo, manque d'interactions directes, sentiment de déconnexion du collectif.</div></div>
+      </div>
+      <button class="btn-primary" onclick="goTo('screen-onboard')">← Rejoindre les défis</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÉCRAN 3 : APP -->
+<div id="screen-app" class="screen">
+  <nav class="top-nav" style="margin:12px 20px;">
+    <div class="logo-wrap" onclick="goTo('screen-onboard')"><span style="font-size:17px">🛸</span><span class="logo-text">Eleven Labs</span></div>
+    <div class="nav-sep"></div>
+    <span class="nav-title">Journée pauses actives</span>
+    <div class="nav-right">
+      <div class="nav-live"><div class="live-dot"></div>En direct</div>
+      <div class="nav-pseudo" id="nav-pseudo"></div>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="stats-bar">
+      <div class="stat hi"><div class="stat-label">Mes défis</div><div class="stat-val" id="my-count">0 <span>/ 11</span></div></div>
+      <div class="stat"><div class="stat-label">Participants</div><div class="stat-val" id="part-count">0</div></div>
+      <div class="stat"><div class="stat-label">Défis validés</div><div class="stat-val" id="total-count">0</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('defis',this)">Mes défis</button>
+      <button class="tab-btn" onclick="showTab('podium',this)">Podium 🏆</button>
+    </div>
+    <div id="tab-defis">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--stress)"></div><span style="color:#F87171">Stress & surcharge</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--physio)"></div><span style="color:#FCD34D">Sédentarité</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--social)"></div><span style="color:#60A5FA">Isolement</span></div>
+      </div>
+      <div class="defis-grid" id="defis-grid"></div>
+    </div>
+    <div id="tab-podium" style="display:none">
+      <div class="podium-stage" id="pod-stage"></div>
+      <div class="lb" id="lb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hd"><div class="m-ico" id="m-ico"></div><h2 id="m-title"></h2></div>
+    <p class="modal-sub" id="m-sub"></p>
+    <div class="modal-rps" id="m-tags"></div>
+    <div class="m-sec">
+      <label>📸 Photo de preuve <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted2)">(optionnel)</span></label>
+      <p class="m-hint">Capture-toi en action pour booster ton score au classement !</p>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-in').click()">
+        <input type="file" id="file-in" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text" id="upload-txt">Prendre une photo ou choisir depuis la galerie</div>
+      </div>
+      <div class="photo-preview" id="photo-prev"><img id="prev-img" src="" alt=""></div>
+    </div>
+    <div class="m-sec">
+      <label>Question de vérification</label>
+      <div class="q-box"><div class="q-label">Prouve-le</div><div class="q-text" id="m-q"></div></div>
+      <textarea id="m-ans" placeholder="Ta réponse…" oninput="checkForm()"></textarea>
+    </div>
+    <div class="m-actions">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-ok" id="btn-ok" onclick="validateDefi()" disabled>Valider le défi →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';  // même origine — pas besoin d'URL absolue
+const DEFIS=[
+  {id:1,e:'📧',n:'Direct Connect',d:'Au lieu d\'envoyer un Slack ou Teams, levez-vous pour aller voir votre collègue directement — ou levez-vous pour l\'appeler !',q:'Quel était le sujet du message que tu es allé livrer en personne ?',rps:['stress','social']},
+  {id:2,e:'🚶',n:'Walking Meeting',d:'Participez à votre réunion en marchant — téléphone en main si vous êtes à distance',q:'De quoi parlait la réunion ? (un mot suffit)',rps:['physio','social']},
+  {id:3,e:'🚲',n:'Active Commute',d:'Rendez-vous au boulot en vélo, en courant ou en marchant — ou descendez un arrêt plus tôt si vous prenez les transports',q:'Quel moyen de transport actif as-tu utilisé ?',rps:['physio']},
+  {id:4,e:'🦵',n:'Leg Sprint',d:'En position assise, décollez vos pieds du sol de 5 à 10 cm et maintenez cette position plusieurs secondes',q:'Combien de séries tu as enchaîné ?',rps:['physio']},
+  {id:5,e:'🥗',n:'Midday Release',d:'Allez marcher, courir ou faire du sport, seul·e ou avec des collègues, sur l\'heure du déjeuner',q:'Qu\'est-ce que tu as fait et avec qui ?',rps:['physio','social']},
+  {id:6,e:'🪜',n:'Level Up',d:'Prenez les escaliers plutôt que l\'ascenseur ou l\'escalator — allez, on se motive !',q:'Combien d\'étages tu as montés en tout ?',rps:['physio']},
+  {id:7,e:'💪',n:'Force Push',d:'Prenez appui avec la paume de vos mains sur le rebord de votre chaise et faites une quinzaine de flexions/extensions des coudes (dips)',q:'Tu as tenu les 15 répétitions ou tu t\'es arrêté à combien ?',rps:['physio']},
+  {id:8,e:'🫀',n:'Cardiac Sync',d:'Prenez 5 min pour pratiquer la cohérence cardiaque : 5 sec d\'inspiration, 5 sec d\'expiration. Répétez 6 fois.',q:'Comment tu te sentais avant et comment tu te sens après ? (un mot pour chacun)',rps:['stress']},
+  {id:9,e:'🫁',n:'Crunch Request',d:'En position assise, contractez le bas du ventre pour lever vos jambes 10 secondes. Relâchez et recommencez 5 fois',q:'Combien de répétitions tu as tenues ?',rps:['physio']},
+  {id:10,e:'🪑',n:'Stand-up meeting',d:'Proposez à vos collègues de faire votre réunion debout — même en visio !',q:'Combien de temps a duré la réunion debout ?',rps:['stress','social']},
+  {id:11,e:'📵',n:'Focus Mode',d:'Deep work — ne touchez pas à votre téléphone pendant 1h. Enfermez-le dans un sac ou un casier si besoin !',q:'Comment tu as occupé cette heure sans téléphone ?',rps:['stress']},
+];
+const TAG_LABELS={stress:'🧠 Stress',physio:'🦴 Sédentarité',social:'🤝 Isolement'};
+const COLS=['#E8335A','#2B7FE8','#0EADAD','#8B5CF6','#F59E0B','#10B981','#EF4444','#6366F1'];
+const gc=n=>{let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLS.length;return COLS[h];};
+const ini=n=>n.slice(0,2).toUpperCase();
+
+let pseudo='', myDone={}, allData={}, curId=null, hasPhoto=false;
+
+// ── API CALLS ──
+async function apiGet(path){ const r=await fetch(API+path); return r.json(); }
+async function apiPost(path,body){ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return r.json(); }
+
+async function startApp(){
+  const v=document.getElementById('pseudo-input').value.trim();
+  if(!v)return;
+  const btn=document.getElementById('btn-join');
+  btn.innerHTML='<div class="spinner"></div>';
+  btn.disabled=true;
+  try{
+    const res=await apiPost('/api/join',{pseudo:v});
+    pseudo=res.pseudo;
+    myDone=res.done||{};
+    document.getElementById('nav-pseudo').textContent=pseudo;
+    goTo('screen-app');
+    await refreshData();
+    setInterval(refreshData, 5000);
+  }catch(e){showToast('Erreur de connexion 😕');}
+  btn.innerHTML='Rejoindre les défis →';
+  btn.disabled=false;
+}
+document.getElementById('pseudo-input').addEventListener('keydown',e=>{if(e.key==='Enter')startApp();});
+
+async function refreshData(){
+  try{
+    allData=await apiGet('/api/data');
+    myDone=allData[pseudo]||{};
+    renderStats();
+    renderDefis();
+    if(document.getElementById('tab-podium').style.display!=='none')renderPodium();
+  }catch(e){console.warn('Refresh failed',e);}
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function renderStats(){
+  const mc=Object.keys(myDone).length;
+  const pl=Object.keys(allData);
+  const tot=pl.reduce((s,p)=>s+Object.keys(allData[p]).length,0);
+  document.getElementById('my-count').innerHTML=mc+' <span>/ 11</span>';
+  document.getElementById('part-count').textContent=pl.length;
+  document.getElementById('total-count').textContent=tot;
+}
+
+function renderTags(rps){return rps.map(r=>`<span class="tag ${r}">${TAG_LABELS[r]}</span>`).join('');}
+
+function renderDefis(){
+  document.getElementById('defis-grid').innerHTML=DEFIS.map(d=>{
+    const done=!!myDone[d.id];
+    const cnt=Object.values(allData).filter(p=>p[d.id]).length;
+    return`<div class="defi-card${done?' done':''}" onclick="openModal(${d.id})">
+      ${done?'<div class="done-tag">✓ Validé</div>':''}
+      <div class="defi-top">
+        <div class="defi-emoji">${d.e}</div>
+        <div><div class="defi-name">${d.n}</div><div class="defi-desc">${d.d}</div></div>
+      </div>
+      <div class="defi-tags">${renderTags(d.rps)}</div>
+      <div class="defi-footer">
+        <div class="defi-peers">${cnt?'<b>'+cnt+'</b> collègue'+(cnt>1?'s ont':' a')+' relevé ce défi':'Sois le premier !'}</div>
+        <button class="defi-cta">${done?'✓ Fait':'Relever →'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(id){
+  if(myDone[id])return;
+  curId=id; hasPhoto=false;
+  const d=DEFIS.find(x=>x.id===id);
+  document.getElementById('m-ico').textContent=d.e;
+  document.getElementById('m-title').textContent=d.n;
+  document.getElementById('m-sub').textContent=d.d;
+  document.getElementById('m-q').textContent=d.q;
+  document.getElementById('m-tags').innerHTML=renderTags(d.rps);
+  document.getElementById('m-ans').value='';
+  document.getElementById('upload-zone').classList.remove('has-file');
+  document.getElementById('upload-txt').textContent='Prendre une photo ou choisir depuis la galerie';
+  document.getElementById('photo-prev').style.display='none';
+  document.getElementById('btn-ok').disabled=true;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');curId=null;}
+
+function handlePhoto(input){
+  if(!input.files||!input.files[0])return;
+  const f=input.files[0]; hasPhoto=true;
+  const r=new FileReader();
+  r.onload=e=>{
+    document.getElementById('prev-img').src=e.target.result;
+    document.getElementById('photo-prev').style.display='block';
+    document.getElementById('upload-zone').classList.add('has-file');
+    document.getElementById('upload-txt').textContent='✓ '+f.name;
+    checkForm();
+  }; r.readAsDataURL(f);
+}
+function checkForm(){document.getElementById('btn-ok').disabled=document.getElementById('m-ans').value.trim().length<2;}
+
+async function validateDefi(){
+  const ans=document.getElementById('m-ans').value.trim();
+  if(!ans||ans.length<2)return;
+  const btn=document.getElementById('btn-ok');
+  btn.innerHTML='<div class="spinner"></div>';
+  btn.disabled=true;
+  try{
+    const res=await apiPost('/api/validate',{pseudo,defiId:curId,answer:ans,hasPhoto});
+    myDone=res.done;
+    closeModal();
+    await refreshData();
+    showToast('Défi validé ! 🔥');
+  }catch(e){showToast('Erreur, réessaie 😕');}
+  btn.innerHTML='Valider le défi →';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function renderPodium(){
+  const all=Object.entries(allData).map(([n,d])=>({name:n,score:Object.keys(d).length})).sort((a,b)=>b.score-a.score);
+  const top3=[all[1],all[0],all[2]].filter(Boolean);
+  const hs=[130,190,95];const medals=['🥈','🥇','🥉'];
+  const podBgs=['rgba(255,255,255,.04)','rgba(232,51,90,.1)','rgba(255,255,255,.02)'];
+  const podBds=['rgba(255,255,255,.08)','rgba(232,51,90,.4)','rgba(255,255,255,.05)'];
+  document.getElementById('pod-stage').innerHTML=top3.length===0
+    ?'<div class="empty" style="width:100%">Valide ton premier défi !</div>'
+    :top3.map((p,i)=>{const col=gc(p.name);return`<div class="pod-col">
+      <div class="pod-av" style="background:${col}22;color:${col};border:1.5px solid ${col}44">${ini(p.name)}</div>
+      <div class="pod-bar" style="height:${hs[i]}px;background:${podBgs[i]};border:1px solid ${podBds[i]}">${medals[i]}</div>
+      <div class="pod-name">${p.name}</div><div class="pod-sc">${p.score} défi${p.score>1?'s':''}</div>
+    </div>`;}).join('');
+  const rkC=['g','s','b'];const rkL=['🥇','🥈','🥉'];
+  document.getElementById('lb').innerHTML=all.length===0
+    ?'<div class="empty">Personne encore !</div>'
+    :all.map((p,i)=>{const isMe=p.name===pseudo;const pct=Math.round(p.score/11*100);const col=gc(p.name);
+      return`<div class="lb-row${isMe?' me':''}">
+        <div class="lb-rk${rkC[i]?' '+rkC[i]:''}">${rkL[i]||i+1}</div>
+        <div class="lb-av" style="background:${col}22;color:${col}">${ini(p.name)}</div>
+        <div class="lb-name${isMe?' me':''}">${p.name}</div>
+        <div class="lb-prog"><div class="lb-fill" style="width:${pct}%"></div></div>
+        <div class="lb-num">${p.score} / 11</div>
+      </div>`;}).join('');
+}
+
+function showTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('tab-defis').style.display=tab==='defis'?'block':'none';
+  document.getElementById('tab-podium').style.display=tab==='podium'?'block':'none';
+  if(tab==='podium')renderPodium();
+}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+</script>
+</body>
+</html>
