@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: qvct-eleven-labs
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_SECRET
+        generateValue: true
