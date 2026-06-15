@@ -297,8 +297,8 @@ const ini=n=>n.slice(0,2).toUpperCase();
 let pseudo='', myDone={}, allData={}, curId=null, hasPhoto=false;
 
 // ── API CALLS ──
-async function apiGet(path){ const r=await fetch(API+path); return r.json(); }
-async function apiPost(path,body){ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return r.json(); }
+async function apiGet(path){ const r=await fetch(API+path); if(!r.ok) throw new Error(await r.text()); return r.json(); }
+async function apiPost(path,body){ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const d=await r.json(); if(!r.ok) throw new Error(d.error||'Erreur serveur'); return d; }
 
 async function startApp(){
   const v=document.getElementById('pseudo-input').value.trim();
@@ -308,13 +308,14 @@ async function startApp(){
   btn.disabled=true;
   try{
     const res=await apiPost('/api/join',{pseudo:v});
+    if(!res.pseudo) throw new Error('Réponse invalide');
     pseudo=res.pseudo;
     myDone=res.done||{};
     document.getElementById('nav-pseudo').textContent=pseudo;
     goTo('screen-app');
     await refreshData();
     setInterval(refreshData, 5000);
-  }catch(e){showToast('Erreur de connexion 😕');}
+  }catch(e){showToast('Erreur de connexion 😕');console.error(e);}
   btn.innerHTML='Rejoindre les défis →';
   btn.disabled=false;
 }
