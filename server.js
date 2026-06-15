@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,61 +10,112 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Cherche les fichiers statiques dans public/ ou à la racine
+// ── STATIC FILES ──
 const publicDir = fs.existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')
   : __dirname;
-
 app.use(express.static(publicDir));
 
-// ── IN-MEMORY STORE ──
-let store = {};
+// ── MONGODB ──
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connecté'))
+  .catch(err => console.error('❌ Erreur MongoDB:', err.message));
 
-// GET /api/data
-app.get('/api/data', (req, res) => {
-  res.json(store);
+// ── SCHEMA ──
+const defiSchema = new mongoose.Schema({
+  defiId:   { type: Number, required: true },
+  answer:   { type: String, required: true },
+  hasPhoto: { type: Boolean, default: false },
+  ts:       { type: Date, default: Date.now }
 });
 
-// GET /api/data/:pseudo
-app.get('/api/data/:pseudo', (req, res) => {
-  const { pseudo } = req.params;
-  res.json(store[pseudo] || {});
-});
+const participantSchema = new mongoose.Schema({
+  pseudo: { type: String, required: true, unique: true, trim: true, maxlength: 20 },
+  defis:  { type: Map, of: defiSchema, default: {} }
+}, { timestamps: true });
 
-// POST /api/join
-app.post('/api/join', (req, res) => {
-  const { pseudo } = req.body;
-  if (!pseudo || pseudo.trim().length === 0) {
-    return res.status(400).json({ error: 'Pseudo invalide' });
+const Participant = mongoose.model('Participant', participantSchema);
+
+// ── HELPERS ──
+// Convertit un participant Mongoose en objet plat { defiId: { ts, answer, hasPhoto } }
+function toPlain(participant) {
+  const done = {};
+  if (participant.defis) {
+    for (const [id, val] of participant.defis.entries()) {
+      done[id] = { ts: val.ts, answer: val.answer, hasPhoto: val.hasPhoto };
+    }
   }
-  const p = pseudo.trim().slice(0, 20);
-  if (!store[p]) store[p] = {};
-  res.json({ pseudo: p, done: store[p] });
+  return done;
+}
+
+// ── ROUTES ──
+
+// GET /api/data — toutes les données
+app.get('/api/data', async (req, res) => {
+  try {
+    const participants = await Participant.find({});
+    const result = {};
+    participants.forEach(p => { result[p.pseudo] = toPlain(p); });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
-// POST /api/validate
-app.post('/api/validate', (req, res) => {
-  const { pseudo, defiId, answer, hasPhoto } = req.body;
-  if (!pseudo || !defiId || !answer) {
-    return res.status(400).json({ error: 'Données manquantes' });
+// POST /api/join — rejoindre ou se reconnecter
+app.post('/api/join', async (req, res) => {
+  try {
+    const { pseudo } = req.body;
+    if (!pseudo || pseudo.trim().length === 0) {
+      return res.status(400).json({ error: 'Pseudo invalide' });
+    }
+    const p = pseudo.trim().slice(0, 20);
+    let participant = await Participant.findOne({ pseudo: p });
+    if (!participant) {
+      participant = await Participant.create({ pseudo: p });
+    }
+    res.json({ pseudo: p, done: toPlain(participant) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
-  if (!store[pseudo]) store[pseudo] = {};
-  store[pseudo][defiId] = {
-    ts: Date.now(),
-    answer: answer.trim(),
-    hasPhoto: !!hasPhoto
-  };
-  res.json({ ok: true, done: store[pseudo] });
 });
 
-// POST /api/reset
-app.post('/api/reset', (req, res) => {
-  const { secret } = req.body;
-  if (secret !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ error: 'Non autorisé' });
+// POST /api/validate — valider un défi
+app.post('/api/validate', async (req, res) => {
+  try {
+    const { pseudo, defiId, answer, hasPhoto } = req.body;
+    if (!pseudo || !defiId || !answer) {
+      return res.status(400).json({ error: 'Données manquantes' });
+    }
+    const participant = await Participant.findOne({ pseudo });
+    if (!participant) {
+      return res.status(404).json({ error: 'Participant introuvable' });
+    }
+    participant.defis.set(String(defiId), {
+      defiId: Number(defiId),
+      answer: answer.trim(),
+      hasPhoto: !!hasPhoto,
+      ts: new Date()
+    });
+    await participant.save();
+    res.json({ ok: true, done: toPlain(participant) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
-  store = {};
-  res.json({ ok: true });
+});
+
+// POST /api/reset — remise à zéro (admin)
+app.post('/api/reset', async (req, res) => {
+  try {
+    const { secret } = req.body;
+    if (secret !== process.env.ADMIN_SECRET) {
+      return res.status(403).json({ error: 'Non autorisé' });
+    }
+    await Participant.deleteMany({});
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Fallback → index.html
@@ -73,5 +125,5 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`✅ Serveur QVCT démarré sur le port ${PORT}`);
-  console.log(`📁 Fichiers statiques servis depuis : ${publicDir}`);
+  console.log(`📁 Fichiers statiques : ${publicDir}`);
 });
